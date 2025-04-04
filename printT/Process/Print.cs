@@ -101,34 +101,52 @@ namespace printT.Process
                         var type = oLinesP[i].oLines[j].type;
                         var style = oLinesP[i].oLines[j].style;
                         var iWith = oLinesP[i].oLines[j].iWith;
+                        var bImage = oLinesP[i].oLines[j].bImage;
+                        var pathImage = oLinesP[i].oLines[j].pathImage ?? "";
 
-                        var oFontStyle = _helpers.getFontStyle(style);
-
-                        int iWithNow = (int)(((decimal)OPrintParameters.oPrinter.maxWidth / (decimal)OPrintParameters.oPrinter.maxMargen) * (decimal)iWith);
-
-                        Font oFont = new Font(type, size, oFontStyle);
-
-                        Rectangle rect = new Rectangle(posX, posY, iWithNow, 10000);
-                        posX += iWithNow;
-
-                        var iWithByLine = OWithBySize.FirstOrDefault(x => x.size == size);
-                        if (iWithByLine == null)
+                        if (!bImage)
                         {
-                            // Si el tamaño no está definido, usa un valor predeterminado (por ejemplo, 50)
-                            iWithByLine = new OWithBySize() { size = size, iWith = 50 };
+                            var oFontStyle = _helpers.getFontStyle(style);
+
+                            int iWithNow = (int)(((decimal)OPrintParameters.oPrinter.maxWidth / (decimal)OPrintParameters.oPrinter.maxMargen) * (decimal)iWith);
+
+                            Font oFont = new Font(type, size, oFontStyle);
+
+                            Rectangle rect = new Rectangle(posX, posY, iWithNow, 10000);
+                            posX += iWithNow;
+
+                            var iWithByLine = OWithBySize.FirstOrDefault(x => x.size == size);
+                            if (iWithByLine == null)
+                            {
+                                // Si el tamaño no está definido, usa un valor predeterminado (por ejemplo, 50)
+                                iWithByLine = new OWithBySize() { size = size, iWith = 50 };
+                            }
+
+                            var iWithByLineN = iWithByLine.iWith - oLinesP[i].oLines.Count - 1;
+                            var porcent = (decimal)iWith / (decimal)100;
+                            var porcentWith = (decimal)iWithByLineN * porcent;
+                            var porcentWithRound = Math.Round(porcentWith);
+                            var div = text.Length / porcentWithRound;
+                            var iTextC = (int)(div + 1) * 13;
+                            iTextCount.Add(iTextC);
+
+                            var stringFormat = _helpers.getAling(aling);
+
+                            e.Graphics.DrawString(text, oFont, Brushes.Black, rect, stringFormat);
                         }
+                        else
+                        {
+                            var imageToPrint = System.Drawing.Image.FromFile("C:\\inetpub\\wwwroot\\printT\\Content\\img\\calificationMage.jpg");
 
-                        var iWithByLineN = iWithByLine.iWith - oLinesP[i].oLines.Count - 1;
-                        var porcent = (decimal)iWith / (decimal)100;
-                        var porcentWith = (decimal)iWithByLineN * porcent;
-                        var porcentWithRound = Math.Round(porcentWith);
-                        var div = text.Length / porcentWithRound;
-                        var iTextC = (int)(div + 1) * 13;
-                        iTextCount.Add(iTextC);
+                            iTextCount.Add(280);
 
-                        var stringFormat = _helpers.getAling(aling);
+                            // Ajustar la imagen al ancho del ticket
+                            int ticketWidth = 280; // Ajusta según tu impresora
+                            int imgHeight = (imageToPrint.Height * ticketWidth) / imageToPrint.Width; // Mantener proporción
 
-                        e.Graphics.DrawString(text, oFont, Brushes.Black, rect, stringFormat);
+                            // Dibujar la imagen centrada
+                            e.Graphics.DrawImage(imageToPrint, new Rectangle(0, posY +10, ticketWidth, imgHeight));
+                        }
                     }
                     var maxLength = iTextCount.Max();
 

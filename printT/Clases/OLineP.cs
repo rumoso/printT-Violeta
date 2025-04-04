@@ -13,5 +13,7 @@ namespace printT.Clases
         public int size { get; set; } = 7;
         public string type { get; set; } = "consola";
         public string style { get; set; } = "Regular";
+        public bool bImage { get; set; }
+        public string pathImage { get; set; }
     }
 }
