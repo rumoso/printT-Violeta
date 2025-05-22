@@ -102,7 +102,9 @@ namespace printT.Process
                         var style = oLinesP[i].oLines[j].style;
                         var iWith = oLinesP[i].oLines[j].iWith;
                         var bImage = oLinesP[i].oLines[j].bImage;
-                        var pathImage = oLinesP[i].oLines[j].pathImage ?? "";
+                        var base64Image = oLinesP[i].oLines[j].base64Image ?? "";
+                        var iHeight = oLinesP[i].oLines[j].iHeight;
+                        var ticketWidth = oLinesP[i].oLines[j].ticketWidth;
 
                         if (!bImage)
                         {
@@ -136,16 +138,19 @@ namespace printT.Process
                         }
                         else
                         {
-                            var imageToPrint = System.Drawing.Image.FromFile("C:\\inetpub\\wwwroot\\printT\\Content\\img\\calificationMage.jpg");
+                            byte[] imageBytes = Convert.FromBase64String(base64Image);
+                            using (var ms = new MemoryStream(imageBytes))
+                            {
+                                var imageToPrint = System.Drawing.Image.FromStream(ms);
 
-                            iTextCount.Add(280);
+                                iTextCount.Add(iHeight);
 
-                            // Ajustar la imagen al ancho del ticket
-                            int ticketWidth = 280; // Ajusta según tu impresora
-                            int imgHeight = (imageToPrint.Height * ticketWidth) / imageToPrint.Width; // Mantener proporción
+                                // Ajustar la imagen al ancho del ticket
+                                int imgHeight = (imageToPrint.Height * ticketWidth) / imageToPrint.Width; // Mantener proporción
 
-                            // Dibujar la imagen centrada
-                            e.Graphics.DrawImage(imageToPrint, new Rectangle(0, posY +10, ticketWidth, imgHeight));
+                                // Dibujar la imagen centrada
+                                e.Graphics.DrawImage(imageToPrint, new Rectangle(0, posY + 10, ticketWidth, imgHeight));
+                            }
                         }
                     }
                     var maxLength = iTextCount.Max();

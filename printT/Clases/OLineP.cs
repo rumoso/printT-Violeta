@@ -14,6 +14,8 @@ namespace printT.Clases
         public string type { get; set; } = "consola";
         public string style { get; set; } = "Regular";
         public bool bImage { get; set; }
-        public string pathImage { get; set; }
+        public string base64Image { get; set; }
+        public int iHeight { get; set; }
+        public int ticketWidth { get; set; }
     }
 }
